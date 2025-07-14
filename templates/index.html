@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Case Tracker</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="p-6 bg-gray-100">
+  <h1 class="text-2xl font-bold mb-4">Case Entry</h1>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="p-3 mb-2 bg-{{ 'red' if category == 'warning' else 'green' if category == 'success' else 'blue' }}-300 text-white rounded">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST" class="grid grid-cols-2 gap-4 mb-4 bg-white p-4 rounded shadow">
+    <input type="text" name="case_number" placeholder="Case Number" class="p-2 border" required>
+
+    <select name="owner" class="p-2 border" required>
+      <option value="" disabled selected>Owner</option>
+      <option>Anuj</option>
+      <option>jessy</option>
+      <option>rohit</option>
+      <option>hema</option>
+      <option>syed</option>
+    </select>
+
+    <select name="product" class="p-2 border" required>
+      <option value="" disabled selected>Product</option>
+      <option>stat</option>
+      <option>up</option>
+    </select>
+
+    <select name="sub_product" class="p-2 border" required>
+      <option value="" disabled selected>Sub Product</option>
+      <option>secureft</option>
+      <option>customer portal</option>
+      <option>stat win</option>
+      <option>stat web</option>
+      <option>upx</option>
+      <option>upe</option>
+    </select>
+
+    <select name="category" class="p-2 border" required>
+      <option value="" disabled selected>Category</option>
+      <option>Add User</option>
+      <option>New Folder</option>
+      <option>Password Reset</option>
+      <option>Security</option>
+      <option>Import Export</option>
+      <option>License Verification</option>
+      <option>Tools Instructions</option>
+      <option>Statement</option>
+    </select>
+
+    <select name="status" class="p-2 border" required>
+      <option value="" disabled selected>Status</option>
+      <option>open</option>
+      <option>additional info</option>
+      <option>customer validation</option>
+      <option>closed</option>
+      <option>dev ticket open</option>
+      <option>on hold</option>
+    </select>
+
+    <input type="date" name="date" class="p-2 border" required>
+
+    <button type="submit" class="col-span-2 bg-blue-500 text-white p-2 rounded">Submit</button>
+  </form>
+
+  <a href="/report" class="inline-block bg-green-500 text-white px-4 py-2 rounded mb-4">Generate Report</a>
+
+  <table class="table-auto w-full bg-white rounded shadow">
+    <thead>
+      <tr class="bg-gray-300">
+        <th>Case No</th><th>Owner</th><th>Product</th><th>Sub-product</th><th>Category</th><th>Status</th><th>Date</th><th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for case in cases %}
+      <tr class="border-b">
+        <td>{{ case.case_number }}</td>
+        <td>{{ case.owner }}</td>
+        <td>{{ case.product }}</td>
+        <td>{{ case.sub_product }}</td>
+        <td>{{ case.category }}</td>
+        <td>{{ case.status }}</td>
+        <td>{{ case.date }}</td>
+        <td class="space-x-2">
+          <a href="/update/{{ case.case_number }}" class="text-blue-500">Update</a>
+          |
+          <form action="/delete/{{ case.case_number }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this case?');">
+            <button type="submit" class="text-red-500">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
+

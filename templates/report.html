@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Report</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="p-6 bg-gray-100">
+  <h1 class="text-2xl font-bold mb-4">Generate Case Report</h1>
+
+  <form method="POST" class="flex gap-4 mb-6 bg-white p-4 rounded shadow">
+    <div>
+      <label class="block font-medium mb-1">Start Date</label>
+      <input type="date" name="start_date" class="p-2 border rounded w-full" required>
+    </div>
+    <div>
+      <label class="block font-medium mb-1">End Date</label>
+      <input type="date" name="end_date" class="p-2 border rounded w-full" required>
+    </div>
+    <div class="flex items-end">
+      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Generate</button>
+    </div>
+  </form>
+
+  {% if data %}
+  <!-- Summary and Download Button Side by Side -->
+  <div class="bg-white p-4 rounded shadow mb-6 flex justify-between items-start">
+    <div>
+      <h2 class="text-lg font-bold mb-2">Summary:</h2>
+      <ul class="mb-4 space-y-1">
+        <li><strong>Total Cases:</strong> {{ summary.total }}</li>
+        <li><strong>Stat Product Cases:</strong> {{ summary.product_counts.stat }}</li>
+        <li><strong>Up Product Cases:</strong> {{ summary.product_counts.up }}</li>
+        <li><strong>Status Breakdown:</strong>
+          <ul class="ml-4 list-disc">
+            {% for status, count in summary.status_counts.items() %}
+            <li>{{ status }}: {{ count }}</li>
+            {% endfor %}
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <form action="/download-report" method="GET">
+      <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Download Report</button>
+    </form>
+  </div>
+
+  {% if grouped %}
+  <div class="bg-white p-4 rounded shadow mb-6">
+    <h2 class="text-lg font-bold mb-2">Closed Cases by Product and Sub-Product:</h2>
+    <table class="w-full border border-gray-300 text-left table-auto">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="border px-3 py-2">Product</th>
+          <th class="border px-3 py-2">Sub Product</th>
+          <th class="border px-3 py-2 text-center">Closed</th>
+          <th class="border px-3 py-2 text-center">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for product, sub_products in grouped.items() %}
+          {% for sub_product, counts in sub_products.items() %}
+          <tr class="hover:bg-gray-50">
+            <td class="border px-3 py-2">{{ product }}</td>
+            <td class="border px-3 py-2">{{ sub_product }}</td>
+            <td class="border px-3 py-2 text-center text-green-600 font-semibold">{{ counts.closed }}</td>
+            <td class="border px-3 py-2 text-center">{{ counts.total }}</td>
+          </tr>
+          {% endfor %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <div class="bg-white p-4 rounded shadow">
+    <h2 class="text-lg font-bold mb-2">Detailed Cases:</h2>
+    <table class="w-full border text-left table-auto">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="border px-3 py-2">Case No</th>
+          <th class="border px-3 py-2">Product</th>
+          <th class="border px-3 py-2">Sub Product</th>
+          <th class="border px-3 py-2">Category</th>
+          <th class="border px-3 py-2">Status</th>
+          <th class="border px-3 py-2">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in data %}
+        <tr class="hover:bg-gray-50">
+          <td class="border px-3 py-2">{{ row.case_number }}</td>
+          <td class="border px-3 py-2">{{ row.product }}</td>
+          <td class="border px-3 py-2">{{ row.sub_product }}</td>
+          <td class="border px-3 py-2">{{ row.category }}</td>
+          <td class="border px-3 py-2">{{ row.status }}</td>
+          <td class="border px-3 py-2">{{ row.date }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <a href="/" class="text-blue-600 underline mt-6 inline-block">← Back to case list</a>
+</body>
+</html>
